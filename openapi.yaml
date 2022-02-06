@@ -1,0 +1,482 @@
+openapi: 3.0.0
+info:
+  title: Projeto API
+  description: Uma API para gerenciar projetos.
+  version: "1.0"
+  contact:
+    name: Samuel Palmeira
+    url: https:github.com/sampalm
+externalDocs:
+  description: Mais informaçoes sobre o projeto.
+  url: "https://github.com/sampalm/gin-boilerplate"
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development Server
+tags:
+  - name: projetos
+    description: Recursos para gerenciamento de projetos
+  - name: api
+    description: Recursos para o gerenciamento de APIs
+  - name: authentication
+    description: Recursos para gerar token de autenticaçao
+paths:
+  /auth:
+    get:
+      summary: Retorna um token
+      description: Gera um novo token que sera necessario para autorizar os requests em todas as rotas da API e Projetos
+      tags:
+        - authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    token: 
+                      type: string
+                      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDQwOTc4OTgsImlhdCI6MTY0NDA5MDY5OCwiaXNzIjoicHJvamVjdC1hcGkifQ.1XrtpKkYLiOiHF8HlUDJ51ikfNmI6uETkvJF41hQQag"
+        500:
+          description: Internal Server Error | Nao foi possivel gerar um novo token
+  /project:
+    description: Cadastrar um projeto
+    post:
+      summary: Cadastra um novo projeto
+      description: Cadastra um novo projeto com os parametros informados no corpo da requisiçao
+      tags:
+        - projetos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: name
+          description: Resource name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: display_name
+          description: Human-meaningful name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: description
+          description: A detailed description
+          required: false
+          schema:
+            type: string
+      responses:
+        201:
+          description: Created
+          content:
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/project'
+        406:
+          description: Not Acceptable | Os dados informados sao invalidos ou incorretos
+        401:
+          description: Unauthorized | Necessita passar um token no header
+  /project/{name}:
+    description: Retorna um projeto com base no parametro
+    get:
+      summary: Retorna um projeto projeto
+      description: Retorna um projeto com os parametros informados
+      tags:
+        - projetos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/project'
+        204:
+          description: No Content | Nenhum projeto encotrado ou cadastrado
+        401:
+          description: Unauthorized | Necessita passar um token no header
+    put:
+      summary: Atualiza um projeto
+      description: Atualiza um projeto existente com os parametros informados no corpo da requisiçao
+      tags:
+        - projetos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: display_name
+          description: Human-meaningful name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: description
+          description: A detailed description
+          required: false
+          schema:
+            type: string
+      responses:
+        200: 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: Project updated
+        406:
+          description: Not Acceptable | Os dados informados sao invalidos ou incorretos
+        401:
+          description: Unauthorized | Necessita passar um token no header
+    delete:
+      summary: Remove um projeto
+      description: Remove um projeto com os parametros informados
+      tags:
+        - projetos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        200: 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: Project deleted
+        406:
+          description: Not Acceptable | Os dados informados sao invalidos ou incorretos
+        401:
+          description: Unauthorized | Necessita passar um token no header
+  /projects:
+    description: Retornar todos os projetos cadastrados
+    get:
+      summary: Retorna todos os projetos
+      description: Retorna todos os projetos cadastrados
+      tags:
+        - projetos
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/projects'
+        204:
+          description: No Content | Nenhum projeto encotrado ou cadastrado
+        401:
+          description: Unauthorized | Necessita passar um token no header
+  /api/{project}/{name}:
+    description: Retorna uma api com os parametros informados
+    get:
+      summary: Retorna uma API
+      description: Retorna uma API com os parametros informados
+      tags:
+        - api
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: project
+          description: Nome do projeto que API esta vinculada
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: name
+          description: Nome da API
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/api'
+        204:
+          description: No Content | Nenhuma api encotrada ou cadastrada
+        401: 
+          description: Unauthorized | Necessita passar um token no header
+    put:
+      summary: Atualiza uma API
+      description: Atualiza uma API com os parametros informados no corpo da requisiçao
+      tags:
+        - api
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: project
+          description: Nome do projeto que API esta vinculada
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: name
+          description: Nome da API
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: description
+          description: A detailed description
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: version
+          description: The last version of API
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: openapi_file
+          description: OpenAPI specification file in a yaml format
+          required: true
+          schema:
+            type: string
+            format: base64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/api'
+        406:
+          description: Not Acceptable | Os dados informados sao invalidos ou incorretos
+        401:
+          description: Unauthorized | Necessita passar um token no header
+    delete:
+      summary: Remove uma API
+      description: Remove uma API com os parametros informados
+      tags:
+        - api
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: project
+          description: Nome do projeto que API esta vinculada
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: name
+          description: Nome da API
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: Project updated
+        406: 
+          description: Not Acceptable | Os dados informados sao invalidos ou incorretos
+        401:
+          description: Unauthorized | Necessita passar um token no header
+  /apis:
+    description: Retorna todas as apis cadastradas
+    get:
+      summary: Retorna todas as APIs
+      description: Retorna todas as APIs cadastradas
+      tags:
+        - api
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis'
+        204:
+          description: No Content | Nenhuma api encotrada ou cadastrada
+        401:
+          description: Unauthorized | Necessita passar um token no header
+  /api:
+    description: Cadastra uma api
+    post:
+      summary: Cadastra uma API
+      description: Cadastra uma nova API com os parametros informados no corpo da requisiçao
+      tags:
+        - api
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: name
+          description: API Resource name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: display_name
+          description: Human-meaningful name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: description
+          description: A detailed description
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: project_name
+          description: Project Resource name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: version
+          description: The last version of API
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: openapi_file
+          description: OpenAPI specification file in a yaml format
+          required: true
+          schema:
+            type: string
+            format: base64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/api'
+        406:
+          description: Not Acceptable | Os dados informados sao invalidos ou incorretos
+        401:
+          description: Unauthorized | Necessita passar um token no header
+components:
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT 
+    schemas:
+      project:
+        type: object
+        properties:
+          name: 
+            type: string
+            example: projeto_teste
+          display_name:
+            type: string
+            example: Projeto Teste
+          description:
+            type: string
+            example: Esse e um projeto de teste
+          create_time:
+            type: string
+            example: "2022-02-05T11:39:52.095678-03:00"
+          update_time:
+            type: string
+            example: "2022-02-05T11:39:52.095678-03:00"
+      projects:
+        type: array
+        items:
+          properties:
+            name: 
+              type: string
+              example: projeto_teste
+            display_name:
+              type: string
+              example: Projeto Teste
+            description:
+              type: string
+              example: Esse e um projeto de teste
+            create_time:
+              type: string
+              example: "2022-02-05T11:39:52.095678-03:00"
+            update_time:
+              type: string
+              example: "2022-02-05T11:39:52.095678-03:00"   
+      api:
+        type: object
+        properties:
+          name: 
+            type: string
+            example: api_test
+          display_name:
+            type: string
+            example: Api Teste
+          version:
+            type: string
+            example: "1.0"
+          openfile_api:
+            type: string
+            format: base64
+            example: "data:@file/x-yaml;base64,LS0tCnN3YWdnZXI6ICIyLjAiCmluZm86CiAgZGVzY3JpcHRpb246ICJUaGlzIGlzIGEgc..."
+          create_time:
+            type: string
+            example: "2022-02-05T11:39:52.095678-03:00"
+          update_time:
+            type: string
+            example: "2022-02-05T11:39:52.095678-03:00"
+      apis:
+        type: array
+        items:
+          properties:
+            name: 
+              type: string
+              example: api_test
+            display_name:
+              type: string
+              example: Api Teste
+            version:
+              type: string
+              example: "1.0"
+            openfile_api:
+              type: string
+              format: base64
+              example: "data:@file/x-yaml;base64,LS0tCnN3YWdnZXI6ICIyLjAiCmluZm86CiAgZGVzY3JpcHRpb246ICJUaGlzIGlzIGEgc..."
+            create_time:
+              type: string
+              example: "2022-02-05T11:39:52.095678-03:00"
+            update_time:
+              type: string
+              example: "2022-02-05T11:39:52.095678-03:00"
+          
+                    
+      

@@ -15,7 +15,7 @@ type API struct {
 	Description string    `json:"description"`
 	Version     string    `json:"version" gorm:"not null" validate:"nonzero"`
 	OpenApiFile string    `json:"openapi_file" validate:"nonzero"`
-	ProjectName string    `json:"project_name" gorm:"not null" validate:"min=3,max=40,regexp=^[a-zA-Z]*$"`
+	ProjectName string    `json:"project_name" gorm:"not null" validate:"min=3,max=40,regexp=^[a-zA-Z-0-9]*$"`
 	CreatedAt   time.Time `json:"create_time"`
 	UpdatedAt   time.Time `json:"update_time"`
 }

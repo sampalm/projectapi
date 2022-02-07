@@ -400,7 +400,7 @@ components:
         properties:
           name: 
             type: string
-            example: projeto_teste
+            example: projetoteste
           display_name:
             type: string
             example: Projeto Teste
@@ -419,7 +419,7 @@ components:
           properties:
             name: 
               type: string
-              example: projeto_teste
+              example: projetoteste
             display_name:
               type: string
               example: Projeto Teste
@@ -437,7 +437,7 @@ components:
         properties:
           name: 
             type: string
-            example: api_test
+            example: apitest
           display_name:
             type: string
             example: Api Teste
@@ -460,7 +460,7 @@ components:
           properties:
             name: 
               type: string
-              example: api_test
+              example: apitest
             display_name:
               type: string
               example: Api Teste
